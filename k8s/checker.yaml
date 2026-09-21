@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: checker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: checker
+  template:
+    metadata:
+      labels:
+        app: checker
+    spec:
+      containers:
+      - name: checker
+        image: 905765459973.dkr.ecr.us-east-2.amazonaws.com/checker:latest
+        env:
+        - name: REDIS_ADDR
+          value: "redis:6379"
