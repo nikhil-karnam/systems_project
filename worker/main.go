@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"time"
 	"os"
+	"math/rand"
 	"encoding/json"
 	"bytes"
 	"strconv"
@@ -69,8 +70,8 @@ func main() {
 		json.Unmarshal([]byte(task), &t)
 		t.WorkerID = workerID
 
-		//do shit
-		key := "tasks/" + strconv.Itoa(t.TicketID) + "-" + strconv.FormatInt(time.Now().UnixNano(), 10) + ".json"
+		//do external shit
+		key := "tasks/" + strconv.Itoa(t.TicketID) + "-" + strconv.Itoa(rand.Intn(1000000)) + ".json"
 		first, _ := rdb.SAdd(ctx, "written", t.TicketID).Result()
 		if first == 1 {
 			_, err := s3c.PutObject(ctx, &s3.PutObjectInput{
