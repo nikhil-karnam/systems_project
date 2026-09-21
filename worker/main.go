@@ -70,12 +70,7 @@ func main() {
 		t.WorkerID = workerID
 
 		//do shit
-		fmt.Printf("%d: %s\n", t.TicketID, t.Message)
-
-		/*the requeue machinery guarantees a task runs at least once, so it can run twice. writing
-		to s3 twice can't be undone, so the write is guarded. SAdd returns 1 if the id was new and
-		0 if it was already there, so the add itself is the check.*/
-		key := "tasks/" + strconv.Itoa(t.TicketID) + ".json"
+		key := "tasks/" + strconv.Itoa(t.TicketID) + "-" + strconv.FormatInt(time.Now().UnixNano(), 10) + ".json"
 		first, _ := rdb.SAdd(ctx, "written", t.TicketID).Result()
 		if first == 1 {
 			_, err := s3c.PutObject(ctx, &s3.PutObjectInput{
