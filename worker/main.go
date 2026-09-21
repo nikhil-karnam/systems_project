@@ -7,6 +7,7 @@ import (
 	"time"
 	"os"
 	"math/rand"
+	"strings"
 	"encoding/json"
 	"bytes"
 	"strconv"
@@ -70,14 +71,22 @@ func main() {
 		json.Unmarshal([]byte(task), &t)
 		t.WorkerID = workerID
 
-		//do external shit
+		//change string
+		t.Message = strings.ToLower(t.Message)
+
+		//wrap
+		res, _ := json.Marshal(t)
+
+		//external task for indepotence check
+		//sends a file to Amazon S3 with ticket number
+		//a retried task should NOT repeat this step
 		key := "tasks/" + strconv.Itoa(t.TicketID) + "-" + strconv.Itoa(rand.Intn(1000000)) + ".json"
 		first, _ := rdb.SAdd(ctx, "written", t.TicketID).Result()
 		if first == 1 {
 			_, err := s3c.PutObject(ctx, &s3.PutObjectInput{
 				Bucket: aws.String(bucket),
 				Key:    aws.String(key),
-				Body:   bytes.NewReader([]byte(task)),
+				Body:   bytes.NewReader(res),
 			})
 			if err != nil {
 				fmt.Println("s3 error:", err)
@@ -92,9 +101,8 @@ func main() {
 
 		//simulate the task actually having latency
 		time.Sleep(50 * time.Millisecond)
-
-		//wrap
-		res, _ := json.Marshal(t)
+		
+		//worker returns the output to redis --> api --> webpage
 		finish.Run(ctx, rdb, []string{"output", "processing", "processTime"}, res, task)		
 	}
 }
