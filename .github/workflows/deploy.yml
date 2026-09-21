@@ -34,3 +34,14 @@ jobs:
           for svc in worker api checker; do
             kubectl set image deployment/$svc $svc=$REG/$svc:${{ github.sha }}
           done
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: website
+        working-directory: front_end
+        run: |
+          npm ci
+          npm run build
+          aws s3 sync dist/ s3://systems-project-web-905765459973/ --delete
