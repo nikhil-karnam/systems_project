@@ -77,7 +77,7 @@ func main() {
 		//wrap
 		res, _ := json.Marshal(t)
 
-		//external task for indepotence check
+		//external task for idempotency check
 		//sends a file to Amazon S3 with ticket number
 		//a retried task should NOT repeat this step
 		key := "tasks/" + strconv.Itoa(t.TicketID) + "-" + strconv.Itoa(rand.Intn(1000000)) + ".json"
