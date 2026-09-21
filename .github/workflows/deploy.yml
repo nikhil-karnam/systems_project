@@ -1,0 +1,36 @@
+name: deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+
+      - uses: aws-actions/amazon-ecr-login@v2
+
+      - name: build and push
+        run: |
+          REG=905765459973.dkr.ecr.us-east-2.amazonaws.com
+          for svc in worker api checker; do
+            docker build -t $REG/$svc:${{ github.sha }} -t $REG/$svc:latest ./$svc
+            docker push $REG/$svc:${{ github.sha }}
+            docker push $REG/$svc:latest
+          done
+
+      - name: deploy
+        run: |
+          aws eks update-kubeconfig --name systems-project --region us-east-2
+          REG=905765459973.dkr.ecr.us-east-2.amazonaws.com
+          for svc in worker api checker; do
+            kubectl set image deployment/$svc $svc=$REG/$svc:${{ github.sha }}
+          done
