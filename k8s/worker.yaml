@@ -18,3 +18,17 @@ spec:
         env:
         - name: REDIS_ADDR
           value: "redis:6379"
+        - name: S3_BUCKET
+          value: "systems-project-905765459973"
+        - name: AWS_REGION
+          value: "us-east-2"
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: s3-creds
+              key: AWS_ACCESS_KEY_ID
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: s3-creds
+              key: AWS_SECRET_ACCESS_KEY
