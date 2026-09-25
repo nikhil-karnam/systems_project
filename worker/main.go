@@ -99,7 +99,7 @@ func main() {
 			fmt.Println("skipped s3, already written:", key)
 		}
 
-		//simulate the task actually having latency
+		//simulate the task actually having process time
 		time.Sleep(50 * time.Millisecond)
 		
 		//worker returns the output to redis --> api --> webpage
