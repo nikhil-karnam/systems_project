@@ -2,7 +2,7 @@ A fault-tolerant task processor on AWS EKS (Kubernetes) with a Redis broker, 4 G
 
 ---
 
-Clicking send on the web page makes the API push 200 tasks with ticket IDs into Redis. Workers pull tasks, lowercase the message, upload it to S3, and push the result to an output queue. The page polls the API every 50 ms and shows results in one column per worker, so you can see each worker's speed and how tasks are spread out.
+Clicking send on the web page makes the API push 200 tasks with ticket IDs into Redis. Workers pull tasks, lowercase the message, upload it to S3, and push the result to an output queue. The page polls the API every 50 ms and shows results in one column per worker, so you can see task distribution amongst workers.
 
 Race conditions: each task is claimed by only one worker.\
 Fault tolerance: if a worker dies mid-task, the sweeper requeues the task.\
