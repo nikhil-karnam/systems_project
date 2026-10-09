@@ -2,15 +2,21 @@ import { useState, useEffect } from 'react';
 
 const API = "http://a2007186fbf734e00bf5ab798a4a0cc0-6175012.us-east-2.elb.amazonaws.com";
 
+type Task = {
+  ticketID: number;
+  workerID: string;
+  message: string;
+};
+
 function App() {
   const [message, setMessage] = useState("");
-  const [results, setResults] = useState([]);
+  const [results, setResults] = useState<Task[]>([]);
 
   useEffect(() => {
     const timer = setInterval(async () => {
       const res = await fetch(`${API}/poll`);
       if (res.status === 200) {
-        const task = await res.json();
+        const task: Task = await res.json();
         setResults(prev => [...prev, task]);
       }
     }, 50);
@@ -30,9 +36,9 @@ function App() {
 
   return (
     <div>
-      <input 
-        value={message} 
-        onChange={e => setMessage(e.target.value)} 
+      <input
+        value={message}
+        onChange={e => setMessage(e.target.value)}
         style={{ fontSize: '24px', padding: '12px', width: '400px' }}
       />
       <button onClick={handleGo} style={{ fontSize: '24px', padding: '12px 32px' }}>
